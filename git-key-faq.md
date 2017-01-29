@@ -9,6 +9,7 @@ http://askubuntu.com/questions/53553/how-do-i-retrieve-the-public-key-from-a-ssh
 
 ### Append Public Key to Authorized Keys on Remote Server
 https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys--2
+
 **Option 1**
 > user@local:~$ ssh-copy-id -i ~/.ssh/id_rsa user@host
 
