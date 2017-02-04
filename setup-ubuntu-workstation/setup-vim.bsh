@@ -1,0 +1,60 @@
+#!/bin/bash
+
+echo "### $(basename $0) ###"
+
+### get varible if run solo ###
+
+if [ -z "${ForceClone}" ]; then
+  ForceClone=$1
+fi
+
+### verify root user ###
+
+User="$(whoami)"
+ValidUserString="root"
+source function/valid-user.bsh
+
+### get client username for su commands ###
+
+HomePath="$HOME"
+ClientUser="$(basename $HOME)"
+if [ -z "${ClientUser}" ]; then
+  echo "[error] ClientUser Not Found! \$(basename \$Home)"
+fi
+
+### vim bundle base directory ###
+
+DirectoryList=( '.vim' '.vim/bundle' )
+for Directory in ${DirectoryList[@]}; do
+  if [ ! -d "${HomePath}/${Directory}" ]; then
+    su ${ClientUser} -c "mkdir ${HomePath}/${Directory}"
+    echo "[notice] Created Directory [${HomePath}]: ${Directory}"
+  else
+    echo "[ok] Found Directory [${HomePath}]: ${Directory}"
+  fi
+done
+
+### vim bundle repositories ###
+
+BundlePath="${HomePath}/.vim/bundle"
+
+declare -A BundleList
+BundleList["vim-terraform"]="https://github.com/hashivim/vim-terraform.git"
+BundleList["vim-ansible"]="https://github.com/pearofducks/ansible-vim.git"
+BundleList["vim-python"]="https://github.com/hdima/python-syntax.git"
+
+for BundleKey in "${!BundleList[@]}"
+do
+  if [ ! -d "${BundlePath}/${BundleKey}" ]; then
+    su ${ClientUser} -c "cd ${BundlePath} && git clone ${BundleList[$BundleKey]} ${BundleKey}"
+    echo "[notice] Cloned Repository [${BundlePath}/${BundleKey}]: ${BundleList[${BundleKey}]}"
+  else
+    if [ "${ForceClone}" == true ]; then
+      cd ${BundlePath} && rm -rf ${BundleKey}
+      su ${ClientUser} -c "cd ${BundlePath} && git clone ${BundleList[$BundleKey]} ${BundleKey}"
+      echo "[notice] Force Cloned Repository [${BundlePath}/${BundleKey}]: ${BundleList[${BundleKey}]}"
+    else
+      echo "[ok] Found Repository [${BundlePath}/${BundleKey}]: ${BundleList[${BundleKey}]}"
+    fi
+  fi
+done

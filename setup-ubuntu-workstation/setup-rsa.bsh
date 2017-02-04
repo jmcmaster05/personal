@@ -1,0 +1,87 @@
+#!/bin/bash
+
+echo "### $(basename $0) ###"
+
+UserEmail="jmcmaste@gmail.com"
+HostName="$(hostname)"
+
+### get varible if run solo ###
+
+if [ -z "${ForceOverwrite}" ]; then
+  ForceOverwrite=$1
+fi
+
+## verify root user ###
+
+User="$(whoami)"
+ValidUserString="root"
+source function/valid-user.bsh
+
+### verify distribution ubuntu ###
+
+ValidDistributionString="Ubuntu"
+source function/valid-distribution.bsh
+
+### get client username for su commands ###
+
+HomePath="$HOME"
+UserName="$(basename $HOME)"
+if [ -z "${UserName}" ]; then
+  echo "[error] UserName Not Found! \$(basename \$Home)"
+fi
+
+### rsa base directory ###
+
+DirectoryList=( '.ssh' '.ssh/github' '.ssh/bitbucket' )
+for Directory in ${DirectoryList[@]}; do
+  if [ ! -d "${HomePath}/${Directory}" ]; then
+    su ${UserName} -c "mkdir ${HomePath}/${Directory}"
+    echo "[notice] Created Directory [${HomePath}]: ${Directory}"
+  else
+    echo "[ok] Found Directory [${HomePath}]: ${Directory}"
+  fi
+done
+
+### rsa key files ###
+
+declare -A KeyPairList
+KeyPairList["github"]="id_rsa"
+KeyPairList["bitbucket"]="id_rsa"
+
+for KeyPair in ${!KeyPairList[@]}; do
+  KeyPath="${HomePath}/.ssh/${KeyPair}"
+  KeyName="${KeyPairList[${KeyPair}]}"
+  KeyFile="${KeyPath}/${KeyName}"
+
+  if [ ! -f "${KeyFile}" ]; then
+    su ${UserName} -c "ssh-keygen -t rsa -b 4096 -q -N '' -f \"${KeyFile}\" -C \"${UserEmail}:${UserName}@${HostName}\""
+    echo "[notice] Created RSA Key Pair [${KeyPair}]: $(cd ${KeyPath} && ls -al ${KeyName})"
+  else
+    if [ "${ForceOverwrite}" == true ]; then
+      TimeStamp=$(date +"%Y%m%d-%H%M%S")
+      su ${UserName} -c "mkdir ${KeyPath}/${TimeStamp}"
+      su ${UserName} -c "mv ${KeyFile}* ${KeyPath}/$(date +"%Y%m%d-%H%M%S")"
+      echo "[notice] Backup RSA Key Pair [${KeyPair}/${TimeStamp}]: $(cd ${KeyPath}/${TimeStamp} && ls -al ${KeyName})"
+
+      su ${UserName} -c "ssh-keygen -t rsa -b 4096 -q -N '' -f \"${KeyFile}\" -C \"${UserEmail}:${UserName}@${HostName}\""
+      echo "[notice] Force Overwrite RSA Key Pair [${KeyPair}]: $(cd ${KeyPath} && ls -al ${KeyName}) [MD5=$(md5sum ${KeyFile} | awk '{ print $1 }')]"
+    else
+      echo "[ok] Found RSA Key Pair [${KeyPair}]: $(cd ${KeyPath} && ls -al ${KeyName}) [MD5=$(md5sum ${KeyFile} | awk '{ print $1 }')] "
+    fi
+  fi
+done
+
+### ssh config ###
+
+# tbd
+
+### show public keys ###
+
+for KeyPair in ${!KeyPairList[@]}; do
+  KeyPath="${HomePath}/.ssh/${KeyPair}"
+  KeyName="${KeyPairList[${KeyPair}]}"
+  KeyFile="${KeyPath}/${KeyName}"
+  echo ">>> ${KeyPair}: ${KeyName}.pub [MD5=$(md5sum ${KeyFile}.pub | awk '{ print $1 }')]"
+  cat ${KeyFile}.pub
+done
+

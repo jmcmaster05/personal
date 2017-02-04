@@ -1,0 +1,40 @@
+#!/bin/bash
+
+### Validate Distribution ###
+# ValidDistributionString="Ubuntu"
+# source function/valid-distribution.bsh
+
+Platform=$(uname)
+case ${Platform} in
+  'Linux')   Platform='linux'    ;;
+  'FreeBSD') Platform='freebsd'  ;;
+  'Darwin')  Platform='darwin'   ;;
+  *)
+    echo "[error] Unknown Platform: ${Platform}"
+    exit 1
+    ;;
+esac
+
+case ${Platform} in
+  linux)
+    Distribution=$(cat /etc/*release | grep DISTRIB_ID | awk -F '=' '{ print $2 }')
+    ;;
+  *)
+    echo "[error] Unknown Distribution: ${Platform}"
+    exit 1
+    ;;
+esac
+
+ValidDistributionList=$(echo ${ValidDistributionString} | tr ',' '\n')
+
+ValidFlag=false
+for ValidDistribution in ${ValidDistributionList[@]}; do
+  if [ ${Distribution} == "${ValidDistribution}" ]; then
+    ValidFlag=true
+  fi
+done 
+
+if [ ${ValidFlag} == false ]; then
+  echo "[error] Distribution Not in Valid List: ${Distribution} (${ValidDistributionString})"
+  exit 1
+fi

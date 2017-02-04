@@ -1,0 +1,59 @@
+#!/bin/bash
+
+echo "### $(basename $0) ###"
+
+### get varible if run solo ###
+
+if [ -z "${ForceUpdate}" ]; then
+  ForceUpdate=$1
+fi
+
+## verify root user ###
+
+User="$(whoami)"
+ValidUserString="root"
+source function/valid-user.bsh
+
+### verify distribution ubuntu ###
+
+ValidDistributionString="Ubuntu"
+source function/valid-distribution.bsh
+
+### update apt package list ###
+
+if [ "${ForceUpdate}" == true ]; then
+  apt-get update
+  echo "[notice] Apt Update Package List"
+  ForceUpdate=false
+fi
+
+### verify aptitude is installed ###
+
+AptPackage="aptitude"
+AptCheck=$(dpkg --get-selections | awk '{ print $1 }' | grep "^${AptPackage}$")
+if [ "${AptCheck}" != "${AptPackage}" ]; then
+  if [ "${ForceUpdate}" == true ]; then
+    apt-get update
+    echo "[notice] Apt Update Package List"
+  fi
+  apt-get install ${AptPackage}
+  echo "[notice] Apt Package Installed: ${AptPackage}"
+else
+  echo "[ok] Apt Package Present: ${AptPackage}"
+fi
+
+### install apt packages ###
+
+AptPackageList=( htop git ansible )
+
+for AptPackage in ${AptPackageList[@]}; do
+  AptCheck=$(aptitude search ${AptPackage} | grep "^i   ${AptPackage} " | wc -l)
+  if [ ${AptCheck} -eq 0 ]; then
+    aptitude install ${AptPackage}
+    AptVersion="$(${AptPackage} --version | head -n 1)"
+    echo "[notice] Apt Package Installed: ${AptVersion}"
+  else
+    AptVersion="$(${AptPackage} --version | head -n 1)"
+    echo "[ok] Apt Packaged Found: ${AptVersion}"
+  fi
+done

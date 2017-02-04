@@ -1,0 +1,21 @@
+#!/bin/bash
+
+### Validate User ###
+
+# User="$(whoami)"
+# ValidUserString="root,bob,sue"
+# source function/valid-user.bsh
+
+ValidUserList=$(echo ${ValidUserString} | tr ',' '\n')
+
+ValidFlag=false
+for ValidUser in ${ValidUserList[@]}; do
+  if [ ${User} == "${ValidUser}" ]; then
+    ValidFlag=true
+  fi
+done 
+
+if [ ${ValidFlag} == false ]; then
+  echo "[error] User Not in Valid List: ${User} (${ValidUserString})"
+  exit 1
+fi
