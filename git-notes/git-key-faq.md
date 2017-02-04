@@ -1,7 +1,7 @@
 # Git Key FAQ
 ### Create Key Pair
 https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
-> user@local:~$ ssh-keygen -t rsa -b 4096 -C "user@host:person@domain.com"
+> user@local:~$ ssh-keygen -t rsa -b 4096 -C "person@domain.com:user@host"
 
 ### Create Public Key from Existing Private Key
 http://askubuntu.com/questions/53553/how-do-i-retrieve-the-public-key-from-a-ssh-private-key
