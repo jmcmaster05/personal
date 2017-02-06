@@ -12,7 +12,7 @@ fi
 
 User="$(whoami)"
 ValidUserString="root"
-source function/valid-user.bsh
+source lib/valid-user.bsh
 
 ### get client username for su commands ###
 

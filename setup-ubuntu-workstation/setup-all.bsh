@@ -6,12 +6,12 @@ echo "### $(basename $0) ###"
 
 User="$(whoami)"
 ValidUserString="root"
-source function/valid-user.bsh
+source lib/valid-user.bsh
 
 ### verify distribution ubuntu ###
 
 ValidDistributionString="Ubuntu"
-source function/valid-distribution.bsh
+source lib/valid-distribution.bsh
 
 ### get command line variables ###
 
