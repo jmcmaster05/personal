@@ -1,0 +1,70 @@
+# --- Bash Aliases and Functions ---
+if [ -f ~/.bashrc ]; then
+  . ~/.bashrc
+fi
+
+# --- Bash Completion ---
+if [ -f /usr/local/etc/bash_completion ]; then
+  . /usr/local/etc/bash_completion
+fi
+
+# --- PATH ---
+PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
+# --- BASH PS1 ---
+# Default Bash Command Prompt on Mac
+#     $ echo $PS1
+#         \h:\W \u\$
+# https://www.cyberciti.biz/tips/howto-linux-unix-bash-shell-setup-prompt.html
+# http://bitmote.com/index.php?post/2012/11/19/Using-ANSI-Color-Codes-to-Colorize-Your-Bash-Prompt-on-Linux
+# http://www.softpanorama.org/Scripting/Shellorama/Reference/bash_prompt_reference.shtml
+# https://en.wikipedia.org/wiki/Box-drawing_character
+#   ─ └ ┌
+# https://en.wikipedia.org/wiki/Unicode_symbols
+#   ‡ † ᵀ
+# https://en.wikipedia.org/wiki/Geometric_Shapes
+#   ▪ ■ ▶ ● ◆ ⬩
+##function __ps1_refresh {
+##  if [[ -n "$(git branch 2>/dev/null | grep '^*' | colrm 1 2)" ]] ; then
+##    if [[ $(git status --porcelain 2>/dev/null | wc -l| tr -d '\040\011\012\015') -gt 0 ]]; then
+##      # Additional Git Repository Reference (UnTracked Files)
+##      PS1="┌─ \e[0;35m\]\u@\h:\e[m\]\e[0;33m\]\w\e[m\] \e[0;31m\](\$(git branch 2>/dev/null | grep '^*' | colrm 1 2) ✘ \$(git status --porcelain 2>/dev/null | wc -l | tr -d '\040\011\012\015'))\e[m\] \n└── \e[0;36m\]\D{%F %T}\e[m\] \\$ "
+##    else
+##      # Additional Git Repository Reference (Clean)
+##      PS1="┌─ \e[0;35m\]\u@\h:\e[m\]\e[0;33m\]\w\e[m\] \e[0;31m\](\$(git branch 2>/dev/null | grep '^*' | colrm 1 2))\e[m\] ✔\n└── \e[0;36m\]\D{%F %T}\e[m\] \\$ "
+##    fi
+##  else
+##    # Default Working Directory Only
+##    PS1="┌─ \e[0;35m\]\u@\h:\e[m\]\e[0;33m\]\w\e[m\] \n└── \e[0;36m\]\D{%F %T}\e[m\] \\$ "
+##  fi
+##}
+##PROMPT_COMMAND='__ps1_refresh'
+#PROMPT_COMMAND="\e[0;35m\]\u@\h:\e[m\]\e[0;33m\]\w\e[m\] \e[0;36m\]\D{%F %T}\e[m\] \\$ "
+PS1="\u@\h:\w$ "
+
+# --- Personal Scripts ---
+PATH=$HOME/Documents/Scripts:$PATH
+
+# ---Ruby ---
+eval "$(rbenv init -)"
+
+# --- Go ---
+GOPATH="$HOME/go"
+PATH=$GOPATH/bin:$PATH
+
+# --- Vault Options ---
+export VAULT_ADDR=https://vault.domain.com
+export VAULT_TOKEN=$(cat $HOME/.vault-token)
+
+# --- Consul Options ---
+export CONSUL_HTTP_ADDR=http://consul.domain.com:8500
+
+# --- Vagrant VirtualBox for Mac ---
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+
+# --- Node ---
+export NVM_DIR="$HOME/.nvm"
+. "/usr/local/opt/nvm/nvm.sh"
+
+# --- xTerm ---
+export PATH=/opt/X11/bin:$PATH
